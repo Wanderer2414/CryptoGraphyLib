@@ -4,6 +4,13 @@
 #include <iostream>
 namespace MyBase {
     namespace Binary {
+        Bytes::Bytes(const std::string& text) {
+            __size = text.size();
+            __buffer = new unsigned char[__size];
+            for (int i = 0; i<__size; i++) {
+                __buffer[__size-i-1] = text[i];
+            }
+        }
         Bytes::Bytes(): __size(0), __buffer(0) {}
 
         Bytes::~Bytes() {
@@ -48,20 +55,28 @@ namespace MyBase {
         }
         Bytes Bytes::operator|(const Bytes& bin) const {
             Bytes out(*this);
-            for (int i = 0; i<__size; i++) out.__buffer[i] |= bin.__buffer[i];
+            for (int i = out.__size-1, j = bin.__size-1; i>=0; i--, j = (j>0)?j-1:bin.__size-1) {
+                out.__buffer[i] |= bin.__buffer[j];
+            }
             return out;
         }
         Bytes& Bytes::operator|=(const Bytes& bin) {
-            for (int i = 0; i<__size; i++) __buffer[i] |= bin.__buffer[i];
+            for (int i = __size-1, j = bin.__size-1; i>=0; i--, j = (j>0)?j-1:bin.__size-1) {
+                __buffer[i] |= bin.__buffer[j];
+            }
             return *this;
         }
         Bytes Bytes::operator&(const Bytes& bin) const {
             Bytes out(*this);
-            for (int i = 0; i<__size; i++) out.__buffer[i] &= bin.__buffer[i];
+            for (int i = out.__size-1, j = bin.__size-1; i>=0; i--, j = (j>0)?j-1:bin.__size-1) {
+                out.__buffer[i] &= bin.__buffer[j];
+            }
             return out;
         }
         Bytes& Bytes::operator&=(const Bytes& bin) {
-            for (int i = 0; i<__size; i++) __buffer[i] |= bin.__buffer[i];
+            for (int i = __size-1, j = bin.__size-1; i>=0; i--, j = (j>0)?j-1:bin.__size-1) {
+                __buffer[i] &= bin.__buffer[j];
+            }
             return *this;
         }
         Bytes::operator std::string() const {
@@ -96,6 +111,37 @@ namespace MyBase {
         }
         const unsigned char& Bytes::operator[](const int& index) const {
             return __buffer[__size - index - 1];
+        }
+
+        Bytes Bytes::operator|(const std::string& str) const {
+            Bytes byte(*this);
+            if (str.empty()) return byte;
+            for (int i = __size-1, j=0; i>=0; i--, j=(j+1)%str.size()) {
+                byte.__buffer[i] |= str[j];
+            }
+            return byte;
+        }
+        Bytes& Bytes::operator|=(const std::string& str) {
+            if (str.empty()) return *this;
+            for (int i = __size-1, j=0; i>=0; i--, j=(j+1)%str.size()) {
+                __buffer[i] |= str[j];
+            }
+            return *this;
+        }
+        Bytes Bytes::operator&(const std::string& str) const {
+            Bytes byte(*this);
+            if (str.empty()) return byte;
+            for (int i = __size-1, j=0; i>=0; i--, j=(j+1)%str.size()) {
+                byte.__buffer[i] &= str[j];
+            }
+            return byte;
+        }
+        Bytes& Bytes::operator&=(const std::string& str) {
+            if (str.empty()) return *this;
+            for (int i = __size-1, j=0; i>=0; i--, j=(j+1)%str.size()) {
+                __buffer[i] &= str[j];
+            }
+            return *this;
         }
     }
 }

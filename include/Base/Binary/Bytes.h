@@ -7,6 +7,7 @@ namespace MyBase {
         class Base64;
         class Bytes {
         public:
+            Bytes(const std::string& text);
             ~Bytes();
 
             int size() const;
@@ -23,6 +24,12 @@ namespace MyBase {
             Bytes& operator|=(char c);
             Bytes operator&(char c) const;
             Bytes& operator&=(char c);
+
+            Bytes operator|(const std::string& str) const;
+            Bytes& operator|=(const std::string& str);
+            Bytes operator&(const std::string& str) const;
+            Bytes& operator&=(const std::string& str);
+
             unsigned char& operator[](const int& index);
             const unsigned char& operator[](const int& index) const;
             operator std::string() const;
