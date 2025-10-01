@@ -16,7 +16,7 @@ namespace MyBase {
             friend std::ostream& operator<<(std::ostream&, const Base64& hex);
         private:
             unsigned char* __buffer;
-            std::size_t __size;
+            int __size;
         };
     }
 }

@@ -10,6 +10,9 @@ namespace MyBase {
             if (__buffer) delete[] __buffer;
         }
 
+        int Bytes::size() const {
+            return __size;
+        }
         Bytes::Bytes(const Bytes& bin) {
             __size = bin.__size;
             __buffer = new unsigned char[__size];
@@ -66,6 +69,33 @@ namespace MyBase {
             out.resize(__size);
             for (int i = 0; i<__size; i++) out[i] = __buffer[__size-i-1];
             return out;
+        }
+
+        Bytes Bytes::operator|(char c) const {
+            Bytes byte(*this);
+            for (int i = 0; i<__size; i++) byte.__buffer[i] |= c;
+            return byte;
+        }
+        Bytes& Bytes::operator|=(char c) {
+            for (int i = 0; i<__size; i++) __buffer[i] |= c;
+            return *this;
+        }
+        Bytes Bytes::operator&(char c) const {
+            Bytes byte(*this);
+            for (int i = 0; i<__size; i++) byte.__buffer[i] &= c;
+            return byte;
+        }
+        Bytes& Bytes::operator&=(char c) {
+            Bytes byte(*this);
+            for (int i = 0; i<__size; i++) byte.__buffer[i] &= c;
+            return *this;
+        }
+
+        unsigned char& Bytes::operator[](const int& index) {
+            return __buffer[__size - index - 1];
+        }
+        const unsigned char& Bytes::operator[](const int& index) const {
+            return __buffer[__size - index - 1];
         }
     }
 }
