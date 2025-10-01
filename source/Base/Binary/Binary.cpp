@@ -54,5 +54,29 @@ namespace MyBase {
             }
             return out;
         }
+
+        Binary Binary::operator~() const {
+            Binary bin(*this);
+            for (int i = 0; i<__size; i++) bin.__buffer[i] = ~bin.__buffer[i];
+            return bin;
+        }
+        Binary Binary::operator|(const Binary& bin) const {
+            Binary out(*this);
+            for (int i = 0; i<__size; i++) out.__buffer[i] |= bin.__buffer[i];
+            return out;
+        }
+        Binary& Binary::operator|=(const Binary& bin) {
+            for (int i = 0; i<__size; i++) __buffer[i] |= bin.__buffer[i];
+            return *this;
+        }
+        Binary Binary::operator&(const Binary& bin) const {
+            Binary out(*this);
+            for (int i = 0; i<__size; i++) out.__buffer[i] &= bin.__buffer[i];
+            return out;
+        }
+        Binary& Binary::operator&=(const Binary& bin) {
+            for (int i = 0; i<__size; i++) __buffer[i] |= bin.__buffer[i];
+            return *this;
+        }
     }
 }

@@ -18,6 +18,11 @@ namespace MyBase {
             Binary(const Binary&);
             Binary(Binary&&);
             Binary& operator=(const Binary&);
+            Binary operator~() const;
+            Binary operator|(const Binary& bin) const;
+            Binary& operator|=(const Binary& bin);
+            Binary operator&(const Binary& bin) const;
+            Binary& operator&=(const Binary& bin);
             friend std::ostream& operator<<(std::ostream& out, const Binary& bin);
             friend class Hexadecimal::Hex;
             friend class Base64::Base64;
