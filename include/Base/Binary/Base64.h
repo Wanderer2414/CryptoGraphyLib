@@ -6,6 +6,7 @@ namespace MyBase {
     namespace Binary {
         class Base64 {
         public:
+            Base64(const std::string& text);
             Base64(const Binary::Bytes& binary);
             ~Base64();
 

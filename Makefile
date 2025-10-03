@@ -24,4 +24,4 @@ clean:
 	rm -rf $(BUILD_DIR)/*
 
 run: 
-	g++ -g Set1/Challenge5/main.cpp bin/*.so -o main
+	g++ -g Set1/Challenge6/main.cpp bin/*.so -o main

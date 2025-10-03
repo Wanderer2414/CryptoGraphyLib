@@ -7,16 +7,27 @@ namespace MyBase {
         class Base64;
         class Bytes {
         public:
+            Bytes(char c);
             Bytes(const std::string& text);
             ~Bytes();
 
+            char most() const;
             int size() const;
-            Bytes(const Bytes&);
-            Bytes(Bytes&&);
+            int count() const;
+            Bytes(const Bytes& byte);
+            Bytes(Bytes&& byte) noexcept;
+
+            Bytes sub(const int& start, const int n) const;
+            Bytes get_seperate(const int& start, const int& distance) const;
+
             Bytes& operator=(const Bytes&);
             Bytes operator~() const;
             Bytes operator|(const Bytes& bin) const;
             Bytes& operator|=(const Bytes& bin);
+
+            Bytes operator+(const Bytes& bin) const;
+            Bytes& operator+=(const Bytes& bin);
+
             Bytes operator&(const Bytes& bin) const;
             Bytes& operator&=(const Bytes& bin);
 
