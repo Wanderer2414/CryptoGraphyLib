@@ -61,6 +61,7 @@ namespace MyBase {
             for (int i = hex.__size-1; i>=0; i--) {
                 if (hex.__buffer[i]<10) cout << char(hex.__buffer[i]+'0');
                 else cout << char(hex.__buffer[i] + 'A' - 10);
+                if (i%2 == 0 && i!=hex.__size-1 && i) cout << ' ';
             }
             return cout;
         }

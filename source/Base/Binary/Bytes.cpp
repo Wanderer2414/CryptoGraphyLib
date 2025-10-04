@@ -9,6 +9,14 @@ namespace MyBase {
             __buffer= new unsigned char[1];
             __buffer[0] = c;
         }
+        Bytes::Bytes(const unsigned int& val) {
+            __size = 4;
+            __buffer = new unsigned char[4];
+            __buffer[3] = val & 0x000000FF;
+            __buffer[2] = (val>>8) & 0x000000FF;
+            __buffer[1] = (val>>16) & 0x000000FF;
+            __buffer[0] = (val>>24) & 0x000000FF;
+        }
         Bytes::Bytes(const std::string& text) {
             __size = text.size();
             __buffer = new unsigned char[__size];
@@ -94,6 +102,11 @@ namespace MyBase {
                     if ((bin.__buffer[i] >> j) % 2) out << '1'; else out<<'0';
                 if (i) out << ' ';
             }
+            return out;
+        }
+
+        char* operator<<(char* out, const Bytes& bin) {
+            for (int i = 0; i<bin.__size; i++) out[bin.__size-i-i] = bin.__buffer[i];
             return out;
         }
 

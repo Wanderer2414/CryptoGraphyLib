@@ -1,27 +1,19 @@
-# Compiler and flags
-CXX := g++
-CXXFLAGS := -fPIC
-LDFLAGS := -shared
-
-# Directories
-SRC_DIR := source/Base/Binary
+SRC_DIR := ./source/Base
 BUILD_DIR := bin
 
-# Source files and corresponding .so targets
-SRCS := $(wildcard $(SRC_DIR)/*.cpp)
+SRCS := $(shell find $(SRC_DIR) -type f -name "*.cpp")
 SOs := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.so,$(SRCS))
 
-# Default target: build all .so files
-all: $(SOs)
+EXES := $(shell find . -type f -name "main.cpp")
 
-# Rule: build one .so from one .cpp
+all: $(SOs) $(basename $(EXES))
+
 $(BUILD_DIR)/%.so: $(SRC_DIR)/%.cpp
-	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $<
+	@mkdir -p $(dir $@)
+	g++ -fPIC -shared -g $< -o $@
 
-# Clean target
+%: %.cpp
+	g++ -g $< $(SOs) -o $@
+	
 clean:
-	rm -rf $(BUILD_DIR)/*
-
-run: 
-	g++ -g Set1/Challenge6/main.cpp bin/*.so -o main
+	@rm -r bin/

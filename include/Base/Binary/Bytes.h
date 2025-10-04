@@ -8,6 +8,7 @@ namespace MyBase {
         class Bytes {
         public:
             Bytes(char c);
+            Bytes(const unsigned int& val);
             Bytes(const std::string& text);
             ~Bytes();
 
@@ -45,6 +46,7 @@ namespace MyBase {
             const unsigned char& operator[](const int& index) const;
             operator std::string() const;
             friend std::ostream& operator<<(std::ostream& out, const Bytes& bin);
+            friend char* operator<<(char*, const Bytes& bin);
             friend class Hex;
             friend class Base64;
         private:
