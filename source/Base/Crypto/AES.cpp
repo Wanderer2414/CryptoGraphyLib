@@ -21,14 +21,14 @@ namespace MyBase {
             if (a==1) return b;
             if (b==1) return a;
 
-            unsigned int out = 0;
-            while (b) {
-                int index = std::floor(std::log2(b));
-                out^=a<<index;
-                b -= 1<<index;
+            unsigned int tmp = a;
+            a = 0;
+            for (; b>0; b>>=1) {
+                if (b%2) a ^= tmp;
+                tmp <<= 1;
+                if (tmp >= 256) tmp ^= 0x11B;
             }
-            if (out>=256) out ^= 0x0000011B;
-            return out;
+            return a;
         }
 
         void AES_128::encrypt(char* plaintext, char* cipher) {
@@ -36,7 +36,8 @@ namespace MyBase {
             __addRoundKey(cipher, 0);
             for (int i = 1; i<=10 ;i++) {
                 for (int i = 0; i<16; i++) cipher[i] = SBox::get(cipher[i]);
-                //Sub text
+                //Shift row
+
                 {
                     char sub[16];
                     for (int i = 0; i<16; i++) {
@@ -45,7 +46,7 @@ namespace MyBase {
                     }
                     memcpy(cipher, sub, 16);
                 }
-                //Mix column
+                //Mix column 
                 if (i<10) {
                     for (int col = 0; col<4; col++) {
                         char code[4];
@@ -59,6 +60,38 @@ namespace MyBase {
                 //
                 __addRoundKey(cipher, i);
             }
+        }
+        void AES_128::decrypt(char* plaintext, char* cipher) {
+            memcpy(plaintext, cipher, 16);
+            for (int i = 10; i>=1; i--) {
+                __addRoundKey(plaintext, i);
+
+
+                //Reverse mix column
+                if (i<10) {
+                    for (int col = 0; col<4; col++) {
+                        char code[4];
+                        code[0] = __mul(plaintext[col*4], 0x0e) ^ __mul(plaintext[col*4+1],0x0b) ^ __mul(plaintext[col*4+2], 0x0d) ^ __mul(plaintext[col*4+3], 0x09);
+                        code[1] = __mul(plaintext[col*4], 0x09) ^ __mul(plaintext[col*4+1],0x0e) ^ __mul(plaintext[col*4+2], 0x0b) ^ __mul(plaintext[col*4+3], 0x0d);
+                        code[2] = __mul(plaintext[col*4], 0x0d) ^ __mul(plaintext[col*4+1],0x09) ^ __mul(plaintext[col*4+2], 0x0e) ^ __mul(plaintext[col*4+3], 0x0b);
+                        code[3] = __mul(plaintext[col*4], 0x0b) ^ __mul(plaintext[col*4+1],0x0d) ^ __mul(plaintext[col*4+2], 0x09) ^ __mul(plaintext[col*4+3], 0x0e);
+                        memcpy(plaintext+col*4, code, 4);
+                    }
+                }
+                
+                //Reverse shift row
+                {
+                    char sub[16];
+                    for (int i = 0; i<16; i++) {
+                        int row = i%4, col = i/4;
+                        sub[i] = plaintext[((col-row+4)%4)*4 + row];
+                    }
+                    memcpy(plaintext, sub, 16);
+                }
+                //Reverse s-box
+                for (int i = 0; i<16; i++) plaintext[i] = SBox::rev(plaintext[i]);
+            }
+            __addRoundKey(plaintext, 0);
         }
 
         void AES_128::__addRoundKey(char* text, const int& index) {

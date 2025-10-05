@@ -106,7 +106,7 @@ namespace MyBase {
         }
 
         char* operator<<(char* out, const Bytes& bin) {
-            for (int i = 0; i<bin.__size; i++) out[bin.__size-i-i] = bin.__buffer[i];
+            for (int i = 0; i<bin.__size; i++) out[bin.__size-i-1] = bin.__buffer[i];
             return out;
         }
 

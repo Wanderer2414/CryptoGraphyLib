@@ -7,6 +7,7 @@ namespace MyBase {
             AES_128(const char* key);
             ~AES_128();
             void encrypt(char* plainttext, char* cipher);
+            void decrypt(char* plainttext, char* cipher);
 
             AES_128(const AES_128&) = delete;
             AES_128(AES_128&&) = delete;

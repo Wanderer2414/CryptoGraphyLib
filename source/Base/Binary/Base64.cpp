@@ -6,13 +6,22 @@
 namespace MyBase {
     namespace Binary {
         Base64::Base64(const Binary::Bytes& binary) {
-            __size = std::ceil(1.f*binary.__size*8/6);
+            __size = std::ceil(1.f*binary.__size/3)*4;
             __buffer = new unsigned char[__size];
-            for (int i = 0, j=0; i<__size; i++, j+=6) {
-                int index = j/8, remain = j%8;
-                __buffer[i] = (binary.__buffer[index] >> remain) & 0x3F;
-                if (remain>2 && index+1<binary.__size) 
-                    __buffer[i] |= (binary.__buffer[index+1] << (8-remain)) & 0x3F;
+            memset(__buffer,0,__size);
+
+            int offset = binary.__size%3;
+            if (offset) {
+                offset ^= 3;
+                memset(__buffer, 255, offset);
+            }
+
+            int j = offset*8;
+            for (int i = 0; i<binary.__size; i++) {
+                int index = j/6, sub_index = j%6;
+                __buffer[index] |= (binary.__buffer[i]<<sub_index) & 0x3F;
+                __buffer[index+1] |= binary.__buffer[i] >> (6-sub_index);
+                j+=8;
             }
         }
         Base64::Base64(const std::string& text) {
@@ -56,25 +65,17 @@ namespace MyBase {
             int offset = 0;
             while (__buffer[offset]==255) offset++;
 
-            bytes.__size = __size*3/4  - offset;
+            bytes.__size = __size*3/4;
+            if (offset == 2) bytes.__size--;
 
             bytes.__buffer = new unsigned char[bytes.__size];
             memset(bytes.__buffer, 0, bytes.__size);
 
             int request = 8, j = 0;
-            if (offset==1) {
-                request = 4;
-                bytes.__buffer[0] |= __buffer[offset] >> (request-2);
-            }
-            else if (offset==2) {
-                request = 6;
-                bytes.__buffer[0] |= __buffer[offset] >> (request-2);
-            }
-            else {
-                bytes.__buffer[0] |= __buffer[offset];
-            }
+            if (offset==1) request = 2;
+            else if (offset == 2) request = 4;
 
-            for (int i = offset+1; i<__size; i++) {
+            for (int i = offset; i<__size; i++) {
                 bytes.__buffer[j] |= __buffer[i]<<(8-request);
                 if (request<8) bytes.__buffer[j+1] |= __buffer[i]>>request;
                 request-=6;
