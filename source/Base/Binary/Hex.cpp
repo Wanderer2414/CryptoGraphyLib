@@ -5,13 +5,15 @@
 namespace MyBase {
     namespace Binary {
         Hex::Hex(const std::string& in) {
-            __size = in.size();
+            int offset = 0;
+            for (int i = 0; i<in.size(); i++) offset += (in[i]==' ');
+            __size = in.size() - offset;
             __buffer = new unsigned char[__size];
-            for (int i = __size-1; i>=0; i--) {
-                if (in[i]>='0' && in[i]<='9') __buffer[__size-i-1] = in[i]-'0';
-                else if (in[i]>='a' && in[i]<='f') __buffer[__size-i-1] = in[i] - 'a' + 10;
-                else if (in[i]>='A' && in[i]<='F') __buffer[__size-i-1] = in[i] - 'A' + 10;
-                else throw "Out of range hex!";
+            for (int i = __size+offset-1, j =0; i>=0; i--) {
+                if (in[i]>='0' && in[i]<='9') __buffer[j++] = in[i]-'0';
+                else if (in[i]>='a' && in[i]<='f') __buffer[j++] = in[i] - 'a' + 10;
+                else if (in[i]>='A' && in[i]<='F') __buffer[j++] = in[i] - 'A' + 10;
+                else if (in[i] != ' ') throw "Out of range hex!";
             }
         }
 
