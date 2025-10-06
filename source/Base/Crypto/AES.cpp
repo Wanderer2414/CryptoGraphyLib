@@ -6,7 +6,7 @@
 #include <iostream>
 namespace MyBase {
     namespace Crypto {
-        AES_128::AES_128(const char* key) {
+        AES_128::AES_128(const char* key, Mode* mode): __mode(mode->clone()) {
             memcpy(__key, key, 4*sizeof(int));
             __key_expand();
             std::string arr;
@@ -14,7 +14,9 @@ namespace MyBase {
             memcpy(arr.data(), __key, 44*4+1);
             arr.back() = 0;
         }
-        AES_128::~AES_128() {}
+        AES_128::~AES_128() {
+            delete __mode;
+        }
 
         unsigned char AES_128::__mul(unsigned char a, unsigned char b) {
             if (!a || !b) return 0;
@@ -30,8 +32,16 @@ namespace MyBase {
             }
             return a;
         }
-
-        void AES_128::encrypt(char* plaintext, char* cipher) {
+        std::string AES_128::encrypt(const std::string& plaintext) {
+            __mode->set_string(plaintext);
+            for (int i = 0; i<__mode->size(); i++) {
+                std::string cipher; cipher.resize(16);
+                __encrypt(__mode->get(i).data(), cipher.data());
+                __mode->push_encrypt(cipher, i);
+            }
+            return __mode->get_string();
+        }
+        void AES_128::__encrypt(char* plaintext, char* cipher) {
             memcpy(cipher, plaintext, 16);
             __addRoundKey(cipher, 0);
             for (int i = 1; i<=10 ;i++) {
@@ -61,7 +71,16 @@ namespace MyBase {
                 __addRoundKey(cipher, i);
             }
         }
-        void AES_128::decrypt(char* plaintext, char* cipher) {
+        std::string AES_128::decrypt(const std::string& cipher) {
+            __mode->set_string(cipher);
+            for (int i =__mode->size()-1;i>=0; i--) {
+                std::string text; text.resize(16);
+                __decrypt(text.data(), __mode->get(i).data());
+                __mode->push_decrypt(text, i);
+            }
+            return __mode->get_string();
+        }
+        void AES_128::__decrypt(char* plaintext, char* cipher) {
             memcpy(plaintext, cipher, 16);
             for (int i = 10; i>=1; i--) {
                 __addRoundKey(plaintext, i);
